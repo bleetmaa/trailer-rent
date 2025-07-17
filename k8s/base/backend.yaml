@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/bleetmaa/trailer-rent-backend:latest
+        image: backend-image
         ports:
         - containerPort: 5000
         env:

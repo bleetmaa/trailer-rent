@@ -10,6 +10,10 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
   IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+  KUBERNETES_HOST: ${{ secrets.KUBERNETES_PUBLIC_IP }}
+
+# NOTE: This workflow supports private Kubernetes clusters using insecure-skip-tls-verify
+# Ensure your KUBE_CONFIG secret contains a valid kubeconfig for your cluster
 
 jobs:
   test-backend:
@@ -135,45 +139,60 @@ jobs:
       
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
       
     - name: Configure kubectl
       run: |
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-        export KUBECONFIG=kubeconfig
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+        # Set insecure flag globally for this cluster
+        kubectl config set-cluster $(kubectl config current-context) --insecure-skip-tls-verify=true
+        
+    - name: Test cluster connection
+      run: |
+        # Verify cluster connection (skip TLS verification for self-signed certs)
+        kubectl cluster-info --insecure-skip-tls-verify
+        kubectl get nodes --insecure-skip-tls-verify
         
     - name: Setup cluster infrastructure
       run: |
-        export KUBECONFIG=kubeconfig
-        
         # Install NGINX Ingress Controller if not exists
-        if ! kubectl get namespace ingress-nginx >/dev/null 2>&1; then
+        if ! kubectl get namespace ingress-nginx --insecure-skip-tls-verify >/dev/null 2>&1; then
           echo "Installing NGINX Ingress Controller..."
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml --insecure-skip-tls-verify
           kubectl wait --namespace ingress-nginx \
             --for=condition=ready pod \
             --selector=app.kubernetes.io/component=controller \
-            --timeout=300s
+            --timeout=300s --insecure-skip-tls-verify
         fi
         
         # Create namespace
-        kubectl create namespace trailer-rent-dev --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create namespace trailer-rent-dev --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
         
         # Create secrets
         kubectl create secret generic postgres-secret \
           --from-literal=password="${{ secrets.POSTGRES_PASSWORD }}" \
           --namespace=trailer-rent-dev \
-          --dry-run=client -o yaml | kubectl apply -f -
+          --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
           
         kubectl create secret generic jwt-secret \
           --from-literal=key="${{ secrets.JWT_SECRET_KEY }}" \
           --namespace=trailer-rent-dev \
-          --dry-run=client -o yaml | kubectl apply -f -
+          --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
         
     - name: Deploy to Dev
       run: |
-        export KUBECONFIG=kubeconfig
-        kubectl apply -k k8s/environments/dev
-        kubectl rollout restart deployment/backend deployment/frontend -n trailer-rent-dev
+        # Update image tags in kustomization
+        cd k8s/environments/dev
+        kustomize edit set image frontend-image=ghcr.io/${{ github.repository }}-frontend:${{ github.sha }}
+        kustomize edit set image backend-image=ghcr.io/${{ github.repository }}-backend:${{ github.sha }}
+        cd ../../..
+        
+        # Apply manifests
+        kubectl apply -k k8s/environments/dev --insecure-skip-tls-verify
+        kubectl rollout restart deployment/backend deployment/frontend -n trailer-rent-dev --insecure-skip-tls-verify
 
   deploy-prod:
     needs: [build-and-push-backend, build-and-push-frontend]
@@ -186,32 +205,47 @@ jobs:
       
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
       
     - name: Configure kubectl
       run: |
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-        export KUBECONFIG=kubeconfig
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+        # Set insecure flag globally for this cluster
+        kubectl config set-cluster $(kubectl config current-context) --insecure-skip-tls-verify=true
+        
+    - name: Test cluster connection
+      run: |
+        # Verify cluster connection (skip TLS verification for self-signed certs)
+        kubectl cluster-info --insecure-skip-tls-verify
+        kubectl get nodes --insecure-skip-tls-verify
         
     - name: Setup cluster infrastructure
       run: |
-        export KUBECONFIG=kubeconfig
-        
         # Create namespace
-        kubectl create namespace trailer-rent-prod --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create namespace trailer-rent-prod --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
         
         # Create secrets
         kubectl create secret generic postgres-secret \
           --from-literal=password="${{ secrets.POSTGRES_PASSWORD }}" \
           --namespace=trailer-rent-prod \
-          --dry-run=client -o yaml | kubectl apply -f -
+          --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
           
         kubectl create secret generic jwt-secret \
           --from-literal=key="${{ secrets.JWT_SECRET_KEY }}" \
           --namespace=trailer-rent-prod \
-          --dry-run=client -o yaml | kubectl apply -f -
+          --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
         
     - name: Deploy to Production
       run: |
-        export KUBECONFIG=kubeconfig
-        kubectl apply -k k8s/environments/prod
-        kubectl rollout restart deployment/backend deployment/frontend -n trailer-rent-prod
+        # Update image tags in kustomization
+        cd k8s/environments/prod
+        kustomize edit set image frontend-image=ghcr.io/${{ github.repository }}-frontend:${{ github.sha }}
+        kustomize edit set image backend-image=ghcr.io/${{ github.repository }}-backend:${{ github.sha }}
+        cd ../../..
+        
+        # Apply manifests
+        kubectl apply -k k8s/environments/prod --insecure-skip-tls-verify
+        kubectl rollout restart deployment/backend deployment/frontend -n trailer-rent-prod --insecure-skip-tls-verify

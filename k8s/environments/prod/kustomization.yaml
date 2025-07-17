@@ -17,9 +17,9 @@ configMapGenerator:
   - API_URL=https://trailerrent.se/api
 
 images:
-- name: frontend-image
-  newName: ghcr.io/bleetmaa/trailer-rent/frontend
+- name: backend-image
+  newName: ghcr.io/bleetmaa/trailer-rent-backend
   newTag: latest
-- name: backend-image  
-  newName: ghcr.io/bleetmaa/trailer-rent/backend
+- name: frontend-image
+  newName: ghcr.io/bleetmaa/trailer-rent-frontend
   newTag: latest

@@ -12,7 +12,9 @@ patchesStrategicMerge:
 - patches/ingress-patch.yaml
 
 images:
-- name: ghcr.io/bleetmaa/trailer-rent-backend
+- name: backend-image
+  newName: ghcr.io/bleetmaa/trailer-rent-backend
   newTag: dev-latest
-- name: ghcr.io/bleetmaa/trailer-rent-frontend  
+- name: frontend-image
+  newName: ghcr.io/bleetmaa/trailer-rent-frontend
   newTag: dev-latest
