@@ -6,8 +6,8 @@ namespace: trailer-rent-prod
 resources:
 - ../../base
 
-patchesStrategicMerge:
-- patches/ingress-patch.yaml
+patches:
+- path: patches/ingress-patch.yaml
 
 configMapGenerator:
 - name: app-config
