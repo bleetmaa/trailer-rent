@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: trailer-rent-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: ghcr.io/bleetmaa/trailer-rent-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: JWT_KEY
+        - name: JWT_ISSUER
+          value: "TrailerRent"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: trailer-rent-dev
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-secret
+  namespace: trailer-rent-dev
+type: Opaque
+data:
+  JWT_KEY: eW91ci1zdXBlci1zZWNyZXQtand0LWtleS10aGF0LWlzLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc= # base64 encoded JWT key

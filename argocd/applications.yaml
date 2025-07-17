@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: trailer-rent-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/bleetmaa/trailer-rent.git
+    targetRevision: develop
+    path: k8s/environments/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: trailer-rent-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: trailer-rent-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/bleetmaa/trailer-rent.git
+    targetRevision: main
+    path: k8s/environments/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: trailer-rent-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
