@@ -38,6 +38,14 @@ This document helps resolve common build issues encountered during CI/CD pipelin
 - Fixed duplicate FROM declarations in Dockerfile
 **Status**: ✅ RESOLVED
 
+### 6. Kubernetes Cluster Connection Timeout
+**Error**: `dial tcp 192.168.1.66:6443: i/o timeout` (GitHub Actions can't reach private cluster)
+**Fix**: 
+- Applied demo-notes app pattern using `--insecure-skip-tls-verify` flag
+- Configured kubectl properly for self-signed certificates
+- Added cluster connection testing before deployment
+**Status**: ✅ RESOLVED
+
 ## 🔧 **Build Process Overview**
 
 The GitHub Actions CI/CD pipeline performs these steps:
