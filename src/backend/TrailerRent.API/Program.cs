@@ -49,7 +49,7 @@ builder.Services.AddDbContext<TrailerRentDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // AutoMapper
-builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+builder.Services.AddAutoMapper(typeof(TrailerRent.Business.Mapping.MappingProfile));
 
 // JWT Configuration
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
