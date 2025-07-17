@@ -2,7 +2,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-config
-  namespace: trailer-rent-dev
 data:
   POSTGRES_DB: trailerrent
   POSTGRES_USER: postgres
@@ -11,7 +10,6 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: trailer-rent-dev
 type: Opaque
 data:
   POSTGRES_PASSWORD: cG9zdGdyZXM= # base64 encoded 'postgres'
@@ -20,7 +18,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: trailer-rent-dev
 spec:
   replicas: 1
   selector:
@@ -53,7 +50,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: trailer-rent-dev
 spec:
   selector:
     app: postgres
@@ -65,7 +61,6 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: trailer-rent-dev
 spec:
   accessModes:
   - ReadWriteOnce

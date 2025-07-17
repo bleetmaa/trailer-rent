@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: trailer-rent-dev
 spec:
   replicas: 2
   selector:
@@ -62,7 +61,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
-  namespace: trailer-rent-dev
 spec:
   selector:
     app: backend
@@ -74,7 +72,6 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: backend-secret
-  namespace: trailer-rent-dev
 type: Opaque
 data:
   JWT_KEY: eW91ci1zdXBlci1zZWNyZXQtand0LWtleS10aGF0LWlzLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc= # base64 encoded JWT key
