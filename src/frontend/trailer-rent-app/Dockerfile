@@ -8,7 +8,6 @@ EXPOSE 4200
 CMD ["npm", "start", "--", "--host", "0.0.0.0", "--poll", "1000"]
 
 # Build stage
-FROM node:18-alpine AS buildBuild stage
 FROM node:20-alpine AS build
 
 WORKDIR /app
