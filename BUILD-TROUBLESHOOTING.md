@@ -31,6 +31,13 @@ This document helps resolve common build issues encountered during CI/CD pipelin
 - Made App.title property public for testing
 **Status**: ✅ RESOLVED
 
+### 5. Docker Build Syntax Error
+**Error**: `FROM requires either one or three arguments` (Frontend Dockerfile line 11)
+**Fix**: 
+- Removed malformed FROM statement `FROM node:18-alpine AS buildBuild stage`
+- Fixed duplicate FROM declarations in Dockerfile
+**Status**: ✅ RESOLVED
+
 ## 🔧 **Build Process Overview**
 
 The GitHub Actions CI/CD pipeline performs these steps:
