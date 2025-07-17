@@ -23,6 +23,14 @@ This document helps resolve common build issues encountered during CI/CD pipelin
 - Fixed class name reference in Program.cs
 **Status**: ✅ RESOLVED
 
+### 4. Angular Test Failures
+**Error**: `Expected undefined to contain 'Hello, trailer-rent-app'`
+**Fix**: 
+- Updated app.spec.ts to test actual component structure
+- Added proper testing modules (RouterTestingModule, HttpClientTestingModule)
+- Made App.title property public for testing
+**Status**: ✅ RESOLVED
+
 ## 🔧 **Build Process Overview**
 
 The GitHub Actions CI/CD pipeline performs these steps:
