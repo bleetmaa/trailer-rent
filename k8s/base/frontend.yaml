@@ -41,7 +41,8 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
   rules:
-  - http:
+  - host: localhost  # This will be replaced by patches
+    http:
       paths:
       - path: /
         pathType: Prefix

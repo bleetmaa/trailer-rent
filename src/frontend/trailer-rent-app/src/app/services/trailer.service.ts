@@ -19,15 +19,34 @@ export class TrailerService {
 
   private testBackendHealth(): void {
     const healthUrl = `${this.API_URL}/health`;
-    console.log('Testing backend health at:', healthUrl);
+    const pingUrl = `${this.API_URL}/ping`;
     
+    console.log('Testing backend health at:', healthUrl);
+    console.log('Testing backend ping at:', pingUrl);
+    
+    // Test health endpoint
     this.http.get(healthUrl, { responseType: 'text' }).subscribe({
       next: (response) => {
         console.log('✅ Backend health check successful:', response);
       },
       error: (error) => {
         console.error('❌ Backend health check failed:', error);
-        console.log('Error details:', {
+        console.log('Health error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url
+        });
+      }
+    });
+
+    // Test ping endpoint
+    this.http.get(pingUrl).subscribe({
+      next: (response) => {
+        console.log('✅ Backend ping successful:', response);
+      },
+      error: (error) => {
+        console.error('❌ Backend ping failed:', error);
+        console.log('Ping error details:', {
           status: error.status,
           statusText: error.statusText,
           url: error.url

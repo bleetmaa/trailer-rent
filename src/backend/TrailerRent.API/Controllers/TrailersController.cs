@@ -32,6 +32,17 @@ public class TrailersController : ControllerBase
         return Ok("Backend is running and healthy");
     }
 
+    [HttpGet("ping")]
+    public ActionResult<object> Ping()
+    {
+        _logger.LogInformation("Ping endpoint called");
+        return Ok(new { 
+            message = "Pong from backend", 
+            timestamp = DateTime.UtcNow,
+            environment = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "Unknown"
+        });
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<TrailerDto>> GetById(int id)
     {
