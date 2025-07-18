@@ -41,6 +41,6 @@ RUN chown -R angular:nodejs /var/cache/nginx && \
 
 USER angular
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
