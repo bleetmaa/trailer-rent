@@ -142,9 +142,15 @@ import { Trailer, TrailerType } from '../../models/models';
               </div>
               
               <div class="price-container">
-                <div class="price-main">
-                  <span class="price-amount">{{ trailer.pricePerDay | currency:'SEK':'symbol':'1.0-0' }}</span>
-                  <span class="price-period">per day</span>
+                <div class="price-options">
+                  <div class="price-main">
+                    <span class="price-amount">{{ trailer.pricePerDay | currency:'SEK':'symbol':'1.0-0' }}</span>
+                    <span class="price-period">per day</span>
+                  </div>
+                  <div class="price-hourly" *ngIf="trailer.pricePerHour">
+                    <span class="price-amount-small">{{ trailer.pricePerHour | currency:'SEK':'symbol':'1.0-0' }}</span>
+                    <span class="price-period-small">per hour</span>
+                  </div>
                 </div>
                 <mat-chip class="availability-chip" highlighted>Available</mat-chip>
               </div>
@@ -456,6 +462,12 @@ import { Trailer, TrailerType } from '../../models/models';
       margin-bottom: 8px;
     }
 
+    .price-options {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .price-main {
       display: flex;
       align-items: baseline;
@@ -470,6 +482,23 @@ import { Trailer, TrailerType } from '../../models/models';
     .price-period {
       font-size: 0.9rem;
       opacity: 0.8;
+    }
+
+    .price-hourly {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      opacity: 0.8;
+    }
+
+    .price-amount-small {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .price-period-small {
+      font-size: 0.8rem;
+      opacity: 0.9;
     }
 
     .availability-chip {

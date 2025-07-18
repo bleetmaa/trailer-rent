@@ -33,6 +33,7 @@ export interface Trailer {
   description?: string;
   type: TrailerType;
   pricePerDay: number;
+  pricePerHour?: number;
   maxWeight: number;
   licensePlate?: string;
   isAvailable: boolean;
@@ -44,6 +45,7 @@ export interface CreateTrailerRequest {
   description?: string;
   type: TrailerType;
   pricePerDay: number;
+  pricePerHour?: number;
   maxWeight: number;
   licensePlate?: string;
 }
@@ -74,6 +76,7 @@ export interface Rental {
   trailer: Trailer;
   startDate: Date;
   endDate: Date;
+  isHourlyRental: boolean;
   totalPrice: number;
   status: RentalStatus;
   notes?: string;
@@ -84,6 +87,7 @@ export interface CreateRentalRequest {
   trailerId: number;
   startDate: Date;
   endDate: Date;
+  isHourlyRental: boolean;
   notes?: string;
 }
 
