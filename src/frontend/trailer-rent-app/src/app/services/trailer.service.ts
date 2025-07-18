@@ -28,6 +28,9 @@ export class TrailerService {
       .set('startDate', startDate.toISOString())
       .set('endDate', endDate.toISOString());
     
+    console.log('Calling API endpoint:', `${this.API_URL}/available-for-dates`);
+    console.log('With params:', params.toString());
+    
     return this.http.get<Trailer[]>(`${this.API_URL}/available-for-dates`, { params });
   }
 

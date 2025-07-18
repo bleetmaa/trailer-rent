@@ -305,14 +305,28 @@ export class TrailerListComponent implements OnInit {
   searchByDates(): void {
     if (this.startDate && this.endDate) {
       this.isLoading = true;
+      console.log('Searching for trailers between:', this.startDate, 'and', this.endDate);
+      
       this.trailerService.getAvailableForDates(this.startDate, this.endDate).subscribe({
         next: (trailers) => {
+          console.log('Successfully received trailers:', trailers);
           this.trailers = trailers;
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Error searching trailers:', error);
-          this.isLoading = false;
+          console.log('Falling back to all available trailers');
+          // Fallback to showing all available trailers
+          this.trailerService.getAvailable().subscribe({
+            next: (trailers) => {
+              this.trailers = trailers;
+              this.isLoading = false;
+            },
+            error: (fallbackError) => {
+              console.error('Error loading fallback trailers:', fallbackError);
+              this.isLoading = false;
+            }
+          });
         }
       });
     }
