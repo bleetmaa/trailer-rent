@@ -237,6 +237,13 @@ jobs:
         kubectl apply -f k8s/setup-storage-job.yaml --insecure-skip-tls-verify
         kubectl wait --for=condition=complete job/setup-storage-job --timeout=300s --insecure-skip-tls-verify
         
+        # Delete PostgreSQL pod and PVC if they exist (to allow PV recreation)
+        kubectl delete pod -l app=postgres -n trailer-rent-prod --insecure-skip-tls-verify || true
+        kubectl delete pvc postgres-pvc -n trailer-rent-prod --insecure-skip-tls-verify || true
+        
+        # Delete old PersistentVolume if it exists with wrong path
+        kubectl delete pv postgres-pv --insecure-skip-tls-verify || true
+        
         # Apply storage configuration
         kubectl apply -f k8s/storage-setup.yaml --insecure-skip-tls-verify
         
