@@ -23,8 +23,8 @@ RUN npm run build
 # Production stage
 FROM nginx:alpine
 
-# Copy built application
-COPY --from=build /app/dist/trailer-rent-app /usr/share/nginx/html
+# Copy built application (Angular 18 outputs to dist/trailer-rent-app/browser)
+COPY --from=build /app/dist/trailer-rent-app/browser /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
