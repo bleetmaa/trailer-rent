@@ -32,10 +32,10 @@ export class TrailerService {
       .set('startDate', startDateStr)
       .set('endDate', endDateStr);
     
-    console.log('Calling API endpoint:', `${this.API_URL}/available-for-dates`);
+    console.log('Calling API endpoint:', `${this.API_URL}/availabledates`);
     console.log('With params:', params.toString());
     
-    return this.http.get<Trailer[]>(`${this.API_URL}/available-for-dates`, { params });
+    return this.http.get<Trailer[]>(`${this.API_URL}/availabledates`, { params });
   }
 
   create(trailer: CreateTrailerRequest): Observable<Trailer> {

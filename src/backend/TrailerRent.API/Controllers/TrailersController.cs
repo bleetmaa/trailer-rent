@@ -61,6 +61,25 @@ public class TrailersController : ControllerBase
         }
     }
 
+    [HttpGet("availabledates")]
+    public async Task<ActionResult<IEnumerable<TrailerDto>>> GetAvailableDates(
+        [FromQuery] DateTime startDate, 
+        [FromQuery] DateTime endDate)
+    {
+        try
+        {
+            _logger.LogInformation("GetAvailableDates called with startDate: {StartDate}, endDate: {EndDate}", startDate, endDate);
+            var trailers = await _trailerService.GetAvailableForDateRangeAsync(startDate, endDate);
+            _logger.LogInformation("Found {Count} available trailers", trailers.Count());
+            return Ok(trailers);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetAvailableDates");
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
     [HttpPost]
     [Authorize]
     public async Task<ActionResult<TrailerDto>> Create([FromBody] CreateTrailerDto createTrailerDto)
