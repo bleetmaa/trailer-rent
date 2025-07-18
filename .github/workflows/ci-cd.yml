@@ -91,7 +91,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: src/backend
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -131,7 +131,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: src/frontend/trailer-rent-app
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
