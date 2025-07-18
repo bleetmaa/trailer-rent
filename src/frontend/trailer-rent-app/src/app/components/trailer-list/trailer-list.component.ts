@@ -40,6 +40,7 @@ import { Trailer, TrailerType } from '../../models/models';
             <input matInput 
                    [matDatepicker]="startPicker" 
                    [(ngModel)]="startDate"
+                   [min]="today"
                    (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
             <mat-datepicker #startPicker></mat-datepicker>
@@ -50,6 +51,7 @@ import { Trailer, TrailerType } from '../../models/models';
             <input matInput 
                    [matDatepicker]="endPicker" 
                    [(ngModel)]="endDate"
+                   [min]="startDate || today"
                    (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
             <mat-datepicker #endPicker></mat-datepicker>
@@ -278,6 +280,7 @@ export class TrailerListComponent implements OnInit {
   startDate: Date | null = null;
   endDate: Date | null = null;
   isLoading = false;
+  today = new Date();
 
   constructor(private trailerService: TrailerService) {}
 
