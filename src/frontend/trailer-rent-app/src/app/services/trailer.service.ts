@@ -24,9 +24,13 @@ export class TrailerService {
   }
 
   getAvailableForDates(startDate: Date, endDate: Date): Observable<Trailer[]> {
+    // Format dates as YYYY-MM-DD to avoid URL encoding issues
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
     const params = new HttpParams()
-      .set('startDate', startDate.toISOString())
-      .set('endDate', endDate.toISOString());
+      .set('startDate', startDateStr)
+      .set('endDate', endDateStr);
     
     console.log('Calling API endpoint:', `${this.API_URL}/available-for-dates`);
     console.log('With params:', params.toString());
