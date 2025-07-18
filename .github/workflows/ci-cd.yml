@@ -256,7 +256,7 @@ jobs:
         
         # Create secrets
         kubectl create secret generic postgres-secret \
-          --from-literal=password="${{ secrets.POSTGRES_PASSWORD }}" \
+          --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
           --namespace=trailer-rent-prod \
           --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
           
