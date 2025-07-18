@@ -38,6 +38,10 @@ spec:
               key: key
         - name: Jwt__Issuer
           value: "TrailerRent"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_SYSTEM_GLOBALIZATION_INVARIANT
+          value: "1"
 ---
 apiVersion: v1
 kind: Service
