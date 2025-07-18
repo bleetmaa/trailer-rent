@@ -232,6 +232,18 @@ jobs:
         
     - name: Setup cluster infrastructure
       run: |
+        # Create storage directory on worker node for PostgreSQL
+        echo "Setting up local storage for PostgreSQL..."
+        kubectl apply -f k8s/setup-storage-job.yaml --insecure-skip-tls-verify
+        kubectl wait --for=condition=complete job/setup-storage-job --timeout=300s --insecure-skip-tls-verify
+        
+        # Apply storage configuration
+        kubectl apply -f k8s/storage-setup.yaml --insecure-skip-tls-verify
+        
+        # Verify storage setup
+        kubectl get storageclass --insecure-skip-tls-verify
+        kubectl get pv --insecure-skip-tls-verify
+        
         # Create namespace
         kubectl create namespace trailer-rent-prod --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
         
@@ -245,6 +257,9 @@ jobs:
           --from-literal=key="${{ secrets.JWT_SECRET_KEY }}" \
           --namespace=trailer-rent-prod \
           --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
+        
+        # Clean up storage setup job
+        kubectl delete job setup-storage-job --insecure-skip-tls-verify || true
         
     - name: Deploy to Production
       run: |
