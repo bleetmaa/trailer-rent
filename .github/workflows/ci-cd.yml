@@ -238,18 +238,24 @@ jobs:
         kubectl wait --for=condition=complete job/setup-storage-job --timeout=300s --insecure-skip-tls-verify
         
         # Delete PostgreSQL pod and PVC if they exist (to allow PV recreation)
-        kubectl delete pod -l app=postgres -n trailer-rent-prod --insecure-skip-tls-verify || true
-        kubectl delete pvc postgres-pvc -n trailer-rent-prod --insecure-skip-tls-verify || true
+        kubectl delete pod -l app=postgres -n trailer-rent-prod --insecure-skip-tls-verify --timeout=60s || true
+        kubectl delete pvc postgres-pvc -n trailer-rent-prod --insecure-skip-tls-verify --timeout=60s || true
         
-        # Delete old PersistentVolume if it exists with wrong path
-        kubectl delete pv postgres-pv --insecure-skip-tls-verify || true
+        # Delete old PersistentVolume if it exists with wrong path (with timeout)
+        kubectl delete pv postgres-pv --insecure-skip-tls-verify --timeout=60s || true
+        
+        # Wait a moment for cleanup to complete
+        sleep 10
         
         # Apply storage configuration
         kubectl apply -f k8s/storage-setup.yaml --insecure-skip-tls-verify
         
-        # Verify storage setup
-        kubectl get storageclass --insecure-skip-tls-verify
-        kubectl get pv --insecure-skip-tls-verify
+        # Verify storage setup with timeout
+        timeout 60 kubectl get storageclass --insecure-skip-tls-verify || echo "StorageClass check timed out"
+        timeout 60 kubectl get pv --insecure-skip-tls-verify || echo "PV check timed out"
+        
+        # Clean up storage setup job immediately
+        kubectl delete job setup-storage-job --insecure-skip-tls-verify --timeout=30s || true
         
         # Create namespace
         kubectl create namespace trailer-rent-prod --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
@@ -264,9 +270,6 @@ jobs:
           --from-literal=key="${{ secrets.JWT_SECRET_KEY }}" \
           --namespace=trailer-rent-prod \
           --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify
-        
-        # Clean up storage setup job
-        kubectl delete job setup-storage-job --insecure-skip-tls-verify || true
         
     - name: Deploy to Production
       run: |
