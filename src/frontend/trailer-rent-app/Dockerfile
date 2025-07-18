@@ -26,8 +26,9 @@ FROM nginx:alpine
 # Copy built application (Angular 18 outputs to dist/trailer-rent-app/browser)
 COPY --from=build /app/dist/trailer-rent-app/browser /usr/share/nginx/html
 
-# Copy nginx configuration
+# Copy nginx configuration and remove default
 COPY nginx.conf /etc/nginx/nginx.conf
+RUN rm -f /etc/nginx/conf.d/default.conf
 
 # Create a non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S angular -u 1001
