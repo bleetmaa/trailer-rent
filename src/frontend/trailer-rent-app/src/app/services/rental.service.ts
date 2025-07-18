@@ -7,7 +7,7 @@ import { Rental, CreateRentalRequest, UpdateRentalStatusRequest } from '../model
   providedIn: 'root'
 })
 export class RentalService {
-  private readonly API_URL = 'http://localhost:5000/api/rentals';
+  private readonly API_URL = '/api/rentals';
 
   constructor(private http: HttpClient) {}
 

@@ -7,7 +7,7 @@ import { LoginRequest, RegisterRequest, AuthResponse, User } from '../models/mod
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:5000/api/auth';
+  private readonly API_URL = '/api/auth';
   private readonly TOKEN_KEY = 'trailer-rent-token';
   
   private currentUserSubject = new BehaviorSubject<User | null>(null);

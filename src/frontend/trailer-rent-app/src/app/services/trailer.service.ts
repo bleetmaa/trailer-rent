@@ -7,7 +7,7 @@ import { Trailer, CreateTrailerRequest } from '../models/models';
   providedIn: 'root'
 })
 export class TrailerService {
-  private readonly API_URL = 'http://localhost:5000/api/trailers';
+  private readonly API_URL = '/api/trailers';
 
   constructor(private http: HttpClient) {}
 
