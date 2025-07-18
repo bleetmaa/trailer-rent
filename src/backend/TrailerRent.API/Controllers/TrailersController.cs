@@ -25,6 +25,13 @@ public class TrailersController : ControllerBase
         return Ok(trailers);
     }
 
+    [HttpGet("health")]
+    public ActionResult<string> Health()
+    {
+        _logger.LogInformation("Health check called");
+        return Ok("Backend is running and healthy");
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<TrailerDto>> GetById(int id)
     {

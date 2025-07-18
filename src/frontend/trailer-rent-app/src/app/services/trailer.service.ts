@@ -9,18 +9,48 @@ import { Trailer, CreateTrailerRequest } from '../models/models';
 export class TrailerService {
   private readonly API_URL = '/api/trailers';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('TrailerService initialized with API_URL:', this.API_URL);
+    console.log('Current window.location:', window.location.href);
+    
+    // Test backend connectivity
+    this.testBackendHealth();
+  }
+
+  private testBackendHealth(): void {
+    const healthUrl = `${this.API_URL}/health`;
+    console.log('Testing backend health at:', healthUrl);
+    
+    this.http.get(healthUrl, { responseType: 'text' }).subscribe({
+      next: (response) => {
+        console.log('✅ Backend health check successful:', response);
+      },
+      error: (error) => {
+        console.error('❌ Backend health check failed:', error);
+        console.log('Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url
+        });
+      }
+    });
+  }
 
   getAll(): Observable<Trailer[]> {
+    console.log('Making API call to:', this.API_URL);
     return this.http.get<Trailer[]>(this.API_URL);
   }
 
   getById(id: number): Observable<Trailer> {
-    return this.http.get<Trailer>(`${this.API_URL}/${id}`);
+    const url = `${this.API_URL}/${id}`;
+    console.log('Making API call to:', url);
+    return this.http.get<Trailer>(url);
   }
 
   getAvailable(): Observable<Trailer[]> {
-    return this.http.get<Trailer[]>(`${this.API_URL}/available`);
+    const url = `${this.API_URL}/available`;
+    console.log('Making API call to:', url);
+    return this.http.get<Trailer[]>(url);
   }
 
   getAvailableForDates(startDate: Date, endDate: Date): Observable<Trailer[]> {
