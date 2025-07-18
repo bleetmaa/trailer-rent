@@ -45,6 +45,18 @@ builder.Services.AddSwaggerGen(c =>
 
 // Database configuration
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// If running in Kubernetes (Production), build connection string from environment variables
+if (builder.Environment.IsProduction())
+{
+    var host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
+    var database = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "trailerrent";
+    var username = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
+    var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "postgres";
+    
+    connectionString = $"Host={host};Database={database};Username={username};Password={password}";
+}
+
 builder.Services.AddDbContext<TrailerRentDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -52,8 +64,8 @@ builder.Services.AddDbContext<TrailerRentDbContext>(options =>
 builder.Services.AddAutoMapper(typeof(TrailerRent.Business.Mapping.MappingProfile));
 
 // JWT Configuration
-var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
-var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer not configured");
+var jwtKey = builder.Configuration["Jwt:Key"] ?? Environment.GetEnvironmentVariable("Jwt__Key") ?? throw new InvalidOperationException("JWT Key not configured");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? Environment.GetEnvironmentVariable("Jwt__Issuer") ?? throw new InvalidOperationException("JWT Issuer not configured");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

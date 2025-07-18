@@ -23,26 +23,20 @@ spec:
         - name: POSTGRES_HOST
           value: "postgres-service"
         - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-config
-              key: POSTGRES_DB
+          value: "trailerrent"
         - name: POSTGRES_USER
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-config
-              key: POSTGRES_USER
+          value: "postgres"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-secret
-              key: POSTGRES_PASSWORD
-        - name: JWT_KEY
+              key: password
+        - name: Jwt__Key
           valueFrom:
             secretKeyRef:
-              name: backend-secret
-              key: JWT_KEY
-        - name: JWT_ISSUER
+              name: jwt-secret
+              key: key
+        - name: Jwt__Issuer
           value: "TrailerRent"
         livenessProbe:
           httpGet:
@@ -67,11 +61,3 @@ spec:
   ports:
   - port: 5000
     targetPort: 5000
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: backend-secret
-type: Opaque
-data:
-  JWT_KEY: eW91ci1zdXBlci1zZWNyZXQtand0LWtleS10aGF0LWlzLWF0LWxlYXN0LTI1Ni1iaXRzLWxvbmc= # base64 encoded JWT key
