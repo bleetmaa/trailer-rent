@@ -5,6 +5,7 @@ resources:
 - backend.yaml
 - frontend.yaml
 - postgres.yaml
+- ingress.yaml
 
 images:
 - name: backend-image
