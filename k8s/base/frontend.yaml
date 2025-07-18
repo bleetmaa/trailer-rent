@@ -41,7 +41,7 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
   rules:
-  - host: localhost  # This will be replaced by patches
+  - host: trailerrent.se  # Default to production host
     http:
       paths:
       - path: /
