@@ -152,14 +152,14 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
                         </mat-error>
                       </mat-form-field>
 
-                      <!-- Start Time (for hourly) -->
-                      <mat-form-field appearance="outline" class="time-field" *ngIf="isHourlyRental">
-                        <mat-label>Start Time</mat-label>
+                      <!-- Start Time -->
+                      <mat-form-field appearance="outline" class="time-field">
+                        <mat-label>Pickup Time</mat-label>
                         <mat-select formControlName="startTime">
                           <mat-option *ngFor="let time of timeSlots" [value]="time">{{ time }}</mat-option>
                         </mat-select>
                         <mat-error *ngIf="rentalForm.get('startTime')?.hasError('required')">
-                          Start time is required
+                          Pickup time is required
                         </mat-error>
                       </mat-form-field>
 
@@ -179,14 +179,14 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
                         </mat-error>
                       </mat-form-field>
 
-                      <!-- End Time (for hourly) -->
-                      <mat-form-field appearance="outline" class="time-field" *ngIf="isHourlyRental">
-                        <mat-label>End Time</mat-label>
+                      <!-- Return Time -->
+                      <mat-form-field appearance="outline" class="time-field">
+                        <mat-label>Return Time</mat-label>
                         <mat-select formControlName="endTime">
                           <mat-option *ngFor="let time of timeSlots" [value]="time">{{ time }}</mat-option>
                         </mat-select>
                         <mat-error *ngIf="rentalForm.get('endTime')?.hasError('required')">
-                          End time is required
+                          Return time is required
                         </mat-error>
                       </mat-form-field>
 
@@ -235,6 +235,10 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
                     <div class="price-line" *ngIf="rentalDuration > 0">
                       <span class="price-label">Duration:</span>
                       <span class="price-value">{{ rentalDuration }} {{ isHourlyRental ? 'hour' : 'day' }}{{ rentalDuration !== 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="price-line" *ngIf="rentalForm.get('startTime')?.value && rentalForm.get('endTime')?.value">
+                      <span class="price-label">{{ isHourlyRental ? 'Time:' : 'Pickup/Return:' }}</span>
+                      <span class="price-value">{{ rentalForm.get('startTime')?.value }} - {{ rentalForm.get('endTime')?.value }}</span>
                     </div>
                     <mat-divider class="price-divider"></mat-divider>
                     <div class="price-line total-line">
@@ -485,7 +489,7 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
     /* Date and Time Fields */
     .date-time-fields {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 16px;
     }
 
@@ -647,7 +651,7 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
       }
 
       .date-time-fields {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
       .trailer-summary {
@@ -678,6 +682,10 @@ import { Trailer, CreateRentalRequest } from '../../models/models';
       .hero-subtitle {
         font-size: 1rem;
       }
+      
+      .date-time-fields {
+        grid-template-columns: 1fr;
+      }
     }
   `]
 })
@@ -689,8 +697,10 @@ export class RentTrailerComponent implements OnInit {
   today = new Date();
   
   timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 
-    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+    '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30',
+    '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30'
   ];
   
   hourOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -707,9 +717,9 @@ export class RentTrailerComponent implements OnInit {
     this.rentalForm = this.fb.group({
       rentalType: ['daily', Validators.required],
       startDate: [null, Validators.required],
-      startTime: ['09:00'],
+      startTime: ['09:00', Validators.required],
       endDate: [null, Validators.required],
-      endTime: ['18:00'],
+      endTime: ['18:00', Validators.required],
       duration: [4],
       notes: ['']
     });
@@ -772,22 +782,14 @@ export class RentTrailerComponent implements OnInit {
   }
 
   updateValidators(): void {
-    const startTime = this.rentalForm.get('startTime');
-    const endTime = this.rentalForm.get('endTime');
     const duration = this.rentalForm.get('duration');
 
     if (this.isHourlyRental) {
-      startTime?.setValidators([Validators.required]);
-      endTime?.setValidators([Validators.required]);
       duration?.setValidators([Validators.required, Validators.min(1)]);
     } else {
-      startTime?.clearValidators();
-      endTime?.clearValidators();
       duration?.clearValidators();
     }
 
-    startTime?.updateValueAndValidity();
-    endTime?.updateValueAndValidity();
     duration?.updateValueAndValidity();
   }
 
@@ -823,18 +825,18 @@ export class RentTrailerComponent implements OnInit {
     let startDate = new Date(formValue.startDate);
     let endDate = new Date(formValue.endDate);
 
+    // Always set specific times for both daily and hourly rentals
+    const [startHour, startMinute] = formValue.startTime.split(':');
+    startDate.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+
     if (this.isHourlyRental) {
-      // Set specific times for hourly rentals
-      const [startHour, startMinute] = formValue.startTime.split(':');
-      startDate.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
-      
       // For hourly rentals, calculate end time based on duration
       endDate = new Date(startDate);
       endDate.setHours(endDate.getHours() + formValue.duration);
     } else {
-      // For daily rentals, set to beginning and end of day
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
+      // For daily rentals, set the specific return time on the end date
+      const [endHour, endMinute] = formValue.endTime.split(':');
+      endDate.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
     }
 
     const rentalRequest: CreateRentalRequest = {
